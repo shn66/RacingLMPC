@@ -7,9 +7,9 @@ import pdb
 
 def plotTrajectory(map, x, x_glob, u):
     Points = int(np.floor(10 * (map.PointAndTangent[-1, 3] + map.PointAndTangent[-1, 4])))
-    Points1 = int(np.zeros((Points, 2)))
-    Points2 = int(np.zeros((Points, 2)))
-    Points0 = int(np.zeros((Points, 2)))
+    Points1 = np.zeros((Points, 2))
+    Points2 = np.zeros((Points, 2))
+    Points0 = np.zeros((Points, 2))
     for i in range(0, int(Points)):
         Points1[i, :] = map.getGlobalPosition(i * 0.1, map.width)
         Points2[i, :] = map.getGlobalPosition(i * 0.1, -map.width)

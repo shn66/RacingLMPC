@@ -42,10 +42,10 @@ import pickle
 # ======================================================================================================================
 # ============================ Choose which controller to run ==========================================================
 # ======================================================================================================================
-RunPID     = 0; plotFlag       = 0
-RunMPC     = 0; plotFlagMPC    = 0
+RunPID     = 0; plotFlag       = 1
+RunMPC     = 0; plotFlagMPC    = 1
 RunMPC_tv  = 0; plotFlagMPC_tv = 0
-RunLMPC    = 0; plotFlagLMPC   = 0; animation_xyFlag = 1; animation_stateFlag = 1
+RunLMPC    = 1; plotFlagLMPC   = 1; animation_xyFlag = 0; animation_stateFlag = 0
 
 # ========================gt==============================================================================================
 # ============================ Initialize parameters for path following ================================================
@@ -54,7 +54,7 @@ dt         = 1.0/10.0        # Controller discretization time
 Time       = 100             # Simulation time for PID
 TimeMPC    = 100             # Simulation time for path following MPC
 TimeMPC_tv = 100             # Simulation time for path following LTV-MPC
-vt         = 10.0             # Reference velocity for path following controllers
+vt         = 9.0             # Reference velocity for path following controllers
 v0         = 10.5            # Initial velocity at lap 0
 N          = 12              # Horizon length
 n = 6;   d = 2               # State and Input dimension
@@ -70,7 +70,7 @@ simulator = Simulator(map)                # Initialize the Simulator
 # ==================================== Initialize parameters for LMPC ==================================================
 # ======================================================================================================================
 TimeLMPC   = 1000              # Simulation time
-Laps       = 10+2             # Total LMPC laps
+Laps       = 5+2             # Total LMPC laps
 
 # Safe Set Parameters
 LMPC_Solver = "OSQP"           # Can pick CVX for cvxopt or OSQP. For OSQP uncomment line 14 in LMPC.py
@@ -83,7 +83,7 @@ Qslack  =  5 * np.diag([1, 1, 1, 1, 10, 1])            # Cost on the slack varia
 Qlane   =  1 * np.array([0, 10])                      # Quadratic and linear slack lane cost
 Q_LMPC  =  0 * np.diag([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])  # State cost x = [vx, vy, wz, epsi, s, ey]
 R_LMPC  =  0 * np.diag([1.0, 1.0])                      # Input cost u = [delta, a]
-dR_LMPC =  2 * np.array([1.0, 0.1])                     # Input rate cost u
+dR_LMPC =  5 * np.array([0.1, 0.1])                     # Input rate cost u
 
 # Initialize LMPC simulator
 LMPCSimulator = Simulator(map, 1, 1)

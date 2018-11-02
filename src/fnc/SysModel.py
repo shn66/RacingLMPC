@@ -2,6 +2,7 @@ import numpy as np
 import pdb
 import datetime
 from Utilities import Curvature, getAngle
+import tiremodels as tm
 
 class Simulator():
     """Vehicle simulator
@@ -125,7 +126,8 @@ def _DynModel(x, x_glob, u, np, dt, PointAndTangent):
     Dr = 0.8 * m * 9.81 / 2.0
     Cr = 250000.0
     Br = 1.0
-
+    mu_p=1.0
+    mu_s=1.0
     # Discretization Parameters
     deltaT = 0.001
     x_next     = np.zeros(x.shape[0])
@@ -152,12 +154,19 @@ def _DynModel(x, x_glob, u, np, dt, PointAndTangent):
     while( (i+1) * deltaT <= dt):
         # Compute tire split angle
         alpha_f = delta - np.arctan2( vy + lf * wz, vx )
+        Fzf=m*9.81*lr/(lr+lf)
+
         alpha_r = - np.arctan2( vy - lf * wz , vx)
+        Fzr=m*9.81*lf/(lr+lf) 
 
         # Compute lateral force at front and rear tire
-        Fyf = Cf * alpha_f
-        Fyr = Cr * alpha_r 
-    
+        #Fyf = Cf * alpha_f
+        Fyf=tm.fiala(Cf,mu_p,mu_s,np.array([-alpha_f]),Fzf)
+        Fyf = Fyf.squeeze()
+        
+        #Fyr = Cr * alpha_r 
+        Fyr=tm.fiala(Cr,mu_p,mu_s,np.array([-alpha_r]),Fzr)
+        Fyr = Fyr.squeeze()
 
         # Propagate the dynamics of deltaT
         x_next[0] = vx  + deltaT * (a - 1 / m * Fyf * np.sin(delta) + wz*vy)
