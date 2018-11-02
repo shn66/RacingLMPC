@@ -42,20 +42,20 @@ import pickle
 # ======================================================================================================================
 # ============================ Choose which controller to run ==========================================================
 # ======================================================================================================================
-RunPID     = 1; plotFlag       = 0
-RunMPC     = 1; plotFlagMPC    = 0
+RunPID     = 0; plotFlag       = 0
+RunMPC     = 0; plotFlagMPC    = 0
 RunMPC_tv  = 0; plotFlagMPC_tv = 0
-RunLMPC    = 1; plotFlagLMPC   = 0; animation_xyFlag = 1; animation_stateFlag = 0
+RunLMPC    = 0; plotFlagLMPC   = 0; animation_xyFlag = 1; animation_stateFlag = 1
 
-# ======================================================================================================================
+# ========================gt==============================================================================================
 # ============================ Initialize parameters for path following ================================================
 # ======================================================================================================================
 dt         = 1.0/10.0        # Controller discretization time
 Time       = 100             # Simulation time for PID
 TimeMPC    = 100             # Simulation time for path following MPC
 TimeMPC_tv = 100             # Simulation time for path following LTV-MPC
-vt         = 0.8             # Reference velocity for path following controllers
-v0         = 0.5             # Initial velocity at lap 0
+vt         = 10.0             # Reference velocity for path following controllers
+v0         = 10.5            # Initial velocity at lap 0
 N          = 12              # Horizon length
 n = 6;   d = 2               # State and Input dimension
 
@@ -63,13 +63,13 @@ n = 6;   d = 2               # State and Input dimension
 Q = np.diag([1.0, 1.0, 1, 1, 0.0, 100.0]) # vx, vy, wz, epsi, s, ey
 R = np.diag([1.0, 10.0])                  # delta, a
 
-map = Map(0.4)                            # Initialize the map
+map = Map(5.0)                            # Initialize the map
 simulator = Simulator(map)                # Initialize the Simulator
 
 # ======================================================================================================================
 # ==================================== Initialize parameters for LMPC ==================================================
 # ======================================================================================================================
-TimeLMPC   = 400              # Simulation time
+TimeLMPC   = 1000              # Simulation time
 Laps       = 10+2             # Total LMPC laps
 
 # Safe Set Parameters
@@ -79,11 +79,11 @@ numSS_Points = 32 + N         # Number of points to select from each trajectory 
 shift = 0                     # Given the closed point, x_t^j, to the x(t) select the SS points from x_{t+shift}^j
 
 # Tuning Parameters
-Qslack  =  5 * np.diag([10, 1, 1, 1, 10, 1])            # Cost on the slack variable for the terminal constraint
+Qslack  =  5 * np.diag([1, 1, 1, 1, 10, 1])            # Cost on the slack variable for the terminal constraint
 Qlane   =  1 * np.array([0, 10])                      # Quadratic and linear slack lane cost
 Q_LMPC  =  0 * np.diag([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])  # State cost x = [vx, vy, wz, epsi, s, ey]
 R_LMPC  =  0 * np.diag([1.0, 1.0])                      # Input cost u = [delta, a]
-dR_LMPC = 10 * np.array([1.0, 10.0])                     # Input rate cost u
+dR_LMPC =  2 * np.array([1.0, 0.1])                     # Input rate cost u
 
 # Initialize LMPC simulator
 LMPCSimulator = Simulator(map, 1, 1)
@@ -105,13 +105,15 @@ else:
     ClosedLoopDataPID = pickle.load(file_data)
     file_data.close()
 print "===== PID terminated"
-
+# pdb.set_trace()
 # ======================================================================================================================
 # ======================================  LINEAR REGRESSION ============================================================
 # ======================================================================================================================
 print "Starting MPC"
 lamb = 0.0000001
 A, B, Error = Regression(ClosedLoopDataPID.x, ClosedLoopDataPID.u, lamb)
+
+print A, B
 
 if RunMPC == 1:
     ClosedLoopDataLTI_MPC = ClosedLoopData(dt, TimeMPC, v0)
@@ -214,9 +216,9 @@ if animation_xyFlag == 1:
 if animation_stateFlag == 1:
     animation_states(map, LMPCOpenLoopData, LMPController, 11)
 
-unityTestChangeOfCoordinates(map, ClosedLoopDataPID)
-unityTestChangeOfCoordinates(map, ClosedLoopDataLTI_MPC)
-unityTestChangeOfCoordinates(map, ClosedLoopLMPC)
+# unityTestChangeOfCoordinates(map, ClosedLoopDataPID)
+# unityTestChangeOfCoordinates(map, ClosedLoopDataLTI_MPC)
+# unityTestChangeOfCoordinates(map, ClosedLoopLMPC)
 
 # saveGif_xyResults(map, LMPCOpenLoopData, LMPController, 36)
 # Save_statesAnimation(map, LMPCOpenLoopData, LMPController, 5)

@@ -336,8 +336,8 @@ def _LMPC_BuildMatIneqConst(LMPC):
     Fx = np.array([[0., 0., 0., 0., 0., 1.],
                    [0., 0., 0., 0., 0., -1.]])
 
-    bx = np.array([[0.4],  # max ey
-                   [0.4]])  # max ey
+    bx = np.array([[5.0],  # max ey
+                   [5.0]])  # max ey
 
     # Buil the matrices for the input constraint in each region. In the region i we want Fx[i]x <= bx[b]
     Fu = np.array([[1., 0.],
@@ -347,8 +347,8 @@ def _LMPC_BuildMatIneqConst(LMPC):
 
     bu = np.array([[0.5],  # Max Steering
                    [0.5],  # Max Steering
-                   [1.],  # Max Acceleration
-                   [1.]])  # Max Acceleration
+                   [5.],  # Max Acceleration
+                   [10.]])  # Max Acceleration
 
 
 
@@ -599,7 +599,7 @@ def _LMPC_EstimateABC(ControllerLMPC, sortedLapTime):
     Atv = []; Btv = []; Ctv = []; indexUsed_list = []
 
     usedIt = sortedLapTime[0:ControllerLMPC.itUsedSysID] # range(ControllerLMPC.it-ControllerLMPC.itUsedSysID, ControllerLMPC.it)
-    MaxNumPoint = 40  # Need to reason on how these points are selected
+    MaxNumPoint = 80  # Need to reason on how these points are selected
 
     if ParallelComputation == 1:
         # Parallel Implementation
@@ -637,7 +637,7 @@ def RegressionAndLinearization(LinPoints, LinInput, usedIt, SS, uSS, TimeSS, Max
     Ci = np.zeros((n, 1))
 
     # Compute Index to use
-    h = 5
+    h = 20
     lamb = 0.0
     stateFeatures = [0, 1, 2]
     ConsiderInput = 1

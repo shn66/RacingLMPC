@@ -14,18 +14,14 @@ class Map():
         """
         # Goggle-shaped track
         self.slack = 0.15
-        self.width = width
-        spec = np.array([[60 * 0.03, 0],
-                         [80 * 0.03, -80 * 0.03 * 2 / np.pi],
+        self.width = width/2.0
+        radius=1.0/0.059014
+        spec = np.array([[21.0, 0],
+                         [np.pi*radius, -radius],
                          # Note s = 1 * np.pi / 2 and r = -1 ---> Angle spanned = np.pi / 2
-                         [20 * 0.03, 0],
-                         [80 * 0.03, -80 * 0.03 * 2 / np.pi],
-                         [40 * 0.03, +40 * 0.03 * 10 / np.pi],
-                         [60 * 0.03, -60 * 0.03 * 5 / np.pi],
-                         [40 * 0.03, +40 * 0.03 * 10 / np.pi],
-                         [80 * 0.03, -80 * 0.03 * 2 / np.pi],
-                         [20 * 0.03, 0],
-                         [80 * 0.03, -80 * 0.03 * 2 / np.pi]])
+                         [41.0, 0],
+                         [np.pi*radius, -radius],
+                         [20.0,0]])
 
         # # L-shaped track
         # self.width = 0.4

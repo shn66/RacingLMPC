@@ -54,7 +54,8 @@ class Simulator():
             if i <= 5:
                 print("Linearization time: %.4fs Solver time: %.4fs" % (Controller.linearizationTime.total_seconds(), Controller.solverTime.total_seconds()))
                 print "Time: ", i * ClosedLoopData.dt, "Current State and Input: ", x[i, :], u[i, :]
-
+            
+            
             if Controller.feasible == 0:
                 print "Unfeasible at time ", i*ClosedLoopData.dt
                 print "Cur State: ", x[i, :], "Iteration ", Controller.it
@@ -95,8 +96,15 @@ class PID:
             x0: current state position
         """
         vt = self.vt
-        self.uPred[0, 0] = - 0.6 * x0[5] - 0.9 * x0[3] + np.max([-0.9, np.min([np.random.randn() * 0.25, 0.9])])
-        self.uPred[0, 1] = 1.5 * (vt - x0[0]) + np.max([-0.2, np.min([np.random.randn() * 0.10, 0.2])])
+        self.uPred[0,0]=0.0
+        #if x0[5]!=0.0:
+        #    self.uPred[0,0]=self.uPred[0,0]-0.44*0.5*np.pi*x0[5]/np.absolute(x0[5])
+        #if x0[3]!=0.0:
+        #    self.uPred[0,0]=self.uPred[0,0]-0.6222*0.5*np.pi*x0[3]/np.absolute(x0[3])
+        #self.uPred[0, 0] = np.pi/2-(-5.28611 * x0[5] - 0.51104445 * x0[3]) #+ np.max([-0.9, np.min([np.random.randn() * 0.25, 0.9])])
+        #self.uPred[0, 0] =(-5.38611 * x0[5] - 0.5114445 * x0[3])
+        self.uPred[0, 0] =(-1.0 * x0[5] - 0.5 * x0[3])+ 0.1*np.max([-0.9, np.min([np.random.randn() * 0.25, 0.9])])
+        self.uPred[0, 1] = 1.112 * (vt - x0[0])+ 1*np.max([-0.2, np.min([np.random.randn() * 0.10, 0.2])])
 # ======================================================================================================================
 # ======================================================================================================================
 # ================================ Internal functions for change of coordinates ========================================
@@ -107,15 +115,15 @@ def _DynModel(x, x_glob, u, np, dt, PointAndTangent):
     # dt <= deltaT and ( dt / deltaT) = integer value
 
     # Vehicle Parameters
-    m  = 1.98
-    lf = 0.125
-    lr = 0.125
-    Iz = 0.024
+    m  = 2303.0
+    lf = 1.52
+    lr = 1.5
+    Iz = 5520.0
     Df = 0.8 * m * 9.81 / 2.0
-    Cf = 1.25
+    Cf = 200000.0
     Bf = 1.0
     Dr = 0.8 * m * 9.81 / 2.0
-    Cr = 1.25
+    Cr = 250000.0
     Br = 1.0
 
     # Discretization Parameters
@@ -127,6 +135,7 @@ def _DynModel(x, x_glob, u, np, dt, PointAndTangent):
     delta = u[0]
     a     = u[1]
 
+    
     psi = x_glob[3]
     X = x_glob[4]
     Y = x_glob[5]
@@ -146,8 +155,9 @@ def _DynModel(x, x_glob, u, np, dt, PointAndTangent):
         alpha_r = - np.arctan2( vy - lf * wz , vx)
 
         # Compute lateral force at front and rear tire
-        Fyf = 2 * Df * np.sin( Cf * np.arctan(Bf * alpha_f ) )
-        Fyr = 2 * Dr * np.sin( Cr * np.arctan(Br * alpha_r ) )
+        Fyf = Cf * alpha_f
+        Fyr = Cr * alpha_r 
+    
 
         # Propagate the dynamics of deltaT
         x_next[0] = vx  + deltaT * (a - 1 / m * Fyf * np.sin(delta) + wz*vy)
@@ -189,9 +199,9 @@ def _DynModel(x, x_glob, u, np, dt, PointAndTangent):
     noise_vy = np.max([-0.1, np.min([np.random.randn() * 0.01, 0.1])])
     noise_wz = np.max([-0.05, np.min([np.random.randn() * 0.005, 0.05])])
 
-    cur_x_next[0] = cur_x_next[0] + 0.1*noise_vx
-    cur_x_next[1] = cur_x_next[1] + 0.1*noise_vy
-    cur_x_next[2] = cur_x_next[2] + 0.1*noise_wz
+    cur_x_next[0] = cur_x_next[0] + 1*noise_vx
+    cur_x_next[1] = cur_x_next[1] + 0.05*noise_vy
+    cur_x_next[2] = cur_x_next[2] + 0.01*noise_wz
 
     return cur_x_next, x_next
 

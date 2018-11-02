@@ -39,7 +39,6 @@ def Curvature(s, PointAndTangent):
     # Given s \in [0, TrackLength] compute the curvature
     # Compute the segment in which system is evolving
     index = np.all([[s >= PointAndTangent[:, 3]], [s < PointAndTangent[:, 3] + PointAndTangent[:, 4]]], axis=0)
-
     i = int(np.where(np.squeeze(index))[0])
     curvature = PointAndTangent[i, 5]
 
